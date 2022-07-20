@@ -8,6 +8,27 @@ import POKEMON_DATA from '../../assets/POKEMON_DATA.json';
 })
 export class ChartService {
 
+  typeColors: any = {
+    'Fire': '#ff2a04',
+    'Grass': '#66cd00',
+    'Normal': '#cdc8b1',
+    'Flying': '#d891ef',
+    'Psychic': '#ff55a3',
+    'Water': '#318ce7',
+    'Bug': '#87a96b',
+    'Rock': '#8b7355',
+    'Electric': '#ffdf00',
+    'Ghost': '#473c8b',
+    'Ice': '#8deeee',
+    'Dark': '#592720',
+    'Fighting': '#b31b1b',
+    'Dragon': '#9932cc',
+    'Poison': '#9400d3',
+    'Steel': '#a8a8a8',
+    'Ground': '#cdc673',
+    'Fairy': '#ffaeb9',
+  }
+
   constructor() { }
 
   getPokemonById(index: number) {
@@ -46,26 +67,7 @@ export class ChartService {
 
     const seriesData: any[] = [];
     const pokemonAttr = ['HP', 'ATK', 'DEF', 'SP. ATK', 'SP. DEF', 'SPD'];
-    const typeColors: any = {
-      'Fire': '#ff2a04',
-      'Grass': '#66cd00',
-      'Normal': '#cdc8b1',
-      'Flying': '#d891ef',
-      'Psychic': '#ff55a3',
-      'Water': '#318ce7',
-      'Bug': '#87a96b',
-      'Rock': '#8b7355',
-      'Electric': '#ffdf00',
-      'Ghost': '#473c8b',
-      'Ice': '#8deeee',
-      'Dark': '#592720',
-      'Fighting': '#b31b1b',
-      'Dragon': '#9932cc',
-      'Poison': '#9400d3',
-      'Steel': '#a8a8a8',
-      'Ground': '#cdc673',
-      'Fairy': '#ffaeb9',
-    }
+    
     types.forEach((t) => {
       pokemonAttr.forEach((attr) => {
         pokemonContainer[t][attr].sort((a: number, b: number) =>  a - b);
@@ -91,7 +93,7 @@ export class ChartService {
         tooltip: {
           headerFormat: '<em>{point.key}</em><br/>'
         },
-        color: typeColors[t],
+        color: this.typeColors[t],
         type: 'boxplot'
       })
     });
@@ -137,7 +139,12 @@ export class ChartService {
     const keys = Object.getOwnPropertyNames(pie);
     for(let k of keys) {
       if(k) {
-        pieData.push([k, pie[k]]);
+        console.log(k);
+        pieData.push(<Highcharts.PointOptionsObject>{
+          name: k,
+          color: this.typeColors[k],
+          y: pie[k]
+        });
       }
     }
     return <Highcharts.Options> {
@@ -148,8 +155,9 @@ export class ChartService {
         type: 'pie'
       },
       series: [{
+        name: 'Count',
         data: pieData,
-        type: 'pie'
+        type: 'pie',
       }],
       plotOptions: {
         pie: {
