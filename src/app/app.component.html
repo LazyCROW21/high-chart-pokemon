@@ -1,6 +1,6 @@
 <div class="container pt-2">
   <h1>Charts using High Charts (Pokemon Dataset)</h1>
-  <hr/>
+  <hr />
   <div class="row">
     <div class="col-12 col-md-6">
       <app-pie-chart></app-pie-chart>
@@ -9,14 +9,36 @@
       <app-box-chart></app-box-chart>
     </div>
   </div>
-  <div class="row my-4 text-center">
-    <div class="col"><hr/></div>
+  <div class="row mt-5 text-center">
+    <div class="col">
+      <hr />
+    </div>
     <div class="col">Compare Pokemon</div>
-    <div class="col"><hr/></div>
+    <div class="col">
+      <hr />
+    </div>
   </div>
-  <div class="row">
-    <div class="col-12">
+  <div class="row mt-5">
+    <div class="col-6">
+      <app-select-dropdown placeholder="Pokemon 1" [options]="pokemonOptions" (select)="pokemonSelect(1, $event)">
+      </app-select-dropdown>
+    </div>
+    <div class="col-6">
+      <app-select-dropdown placeholder="Pokemon 2" [options]="pokemonOptions" (select)="pokemonSelect(2, $event)">
+      </app-select-dropdown>
+    </div>
+    <div class="col-12 mt-5">
       <app-bar-chart></app-bar-chart>
     </div>
   </div>
 </div>
+<footer class="mt-5">
+  <figure class="bg-dark text-light text-center p-4 mb-0">
+    <blockquote class="blockquote">
+      <p>There is no such thing as information overload. There is only bad design.</p>
+    </blockquote>
+    <figcaption class="blockquote-footer">
+      <cite title="Source Title">Edward Tufte</cite>
+    </figcaption>
+  </figure>
+</footer>

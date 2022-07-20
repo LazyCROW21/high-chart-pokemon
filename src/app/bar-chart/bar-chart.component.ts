@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import { ChartService } from '../chart-service/chart.service';
 
 @Component({
   selector: 'app-bar-chart',
@@ -17,20 +18,37 @@ export class BarChartComponent implements OnInit {
       type: 'bar'
     },
     xAxis: {
-      categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
+      categories: ['HP', 'ATK', 'DEF', 'SP. ATK', 'SP. DEF', 'SPD'],
       title: {
         text: null
       }
     },
-    series: [{
-      name: 'Avg',
-      data: [
-        ['E', 1],
-        ['B', 4],
-        ['C', 2],
-      ],
-      type: 'bar'
-    }],
+    series: [
+      {
+        name: 'Pokemon 1',
+        data: [
+          ['HP', 1],
+          ['ATK', 4],
+          ['DEF', 2],
+          ['SP. ATK', 2],
+          ['SP. DEF', 2],
+          ['SPD', 2],
+        ],
+        type: 'bar'
+      },
+      {
+        name: 'Pokemon 2',
+        data: [
+          ['HP', 1],
+          ['ATK', 4],
+          ['DEF', 2],
+          ['SP. ATK', 2],
+          ['SP. DEF', 2],
+          ['SPD', 2],
+        ],
+        type: 'bar'
+      }
+    ],
     plotOptions: {
       bar: {
         dataLabels: { enabled: true }
@@ -40,16 +58,14 @@ export class BarChartComponent implements OnInit {
       enabled: false
     }
   }; // required
-  chartCallback: Highcharts.ChartCallbackFunction = function (chart) {
-    console.log("Hello", chart);
-  } // optional function, defaults to null
   updateFlag: boolean = false; // optional boolean
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
-  constructor() { }
+  constructor(private chartService: ChartService) { }
 
   ngOnInit(): void {
+    this.chartOptions = this.chartService.getComparePokemonData(3, 6);
   }
 
 }

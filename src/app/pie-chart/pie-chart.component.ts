@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import { ChartService } from '../chart-service/chart.service';
 
 @Component({
   selector: 'app-pie-chart',
@@ -38,16 +39,14 @@ export class PieChartComponent implements OnInit {
       enabled: false
     }
   }; // required
-  chartCallback: Highcharts.ChartCallbackFunction = function (chart) {
-    console.log("Hello", chart);
-  } // optional function, defaults to null
   updateFlag: boolean = false; // optional boolean
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
-  constructor() { }
+  constructor(private chartService: ChartService) { }
 
   ngOnInit(): void {
+    this.chartOptions = this.chartService.getTypeChart();
   }
 
 }

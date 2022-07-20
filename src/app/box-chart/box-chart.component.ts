@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more'
+import { ChartService } from '../chart-service/chart.service';
 
 HighchartsMore(Highcharts);
 
@@ -20,20 +21,22 @@ export class BoxChartComponent implements OnInit {
       type: 'boxplot'
     },
     series: [{
+      name: 'Type 1',
       data: [
         [760, 801, 848, 895, 965],
         [733, 853, 939, 980, 1080],
         [714, 762, 817, 870, 918],
         [724, 802, 806, 871, 950],
+        [834, 836, 864, 882, 910],
         [834, 836, 864, 882, 910]
       ],
       tooltip: {
-        headerFormat: '<em>Experiment No {point.key}</em><br/>'
+        headerFormat: '<em>{point.key}</em><br/>'
       },
       type: 'boxplot'
     }],
     xAxis: {
-      categories: ['1', '2', '3', '4', '5'],
+      categories: ['HP', 'ATK', 'DEF', 'SP. ATK', 'SP. DEF', 'SPD'],
       title: {
         text: 'Experiment No.'
       }
@@ -44,16 +47,14 @@ export class BoxChartComponent implements OnInit {
       enabled: false
     }
   }; // required
-  chartCallback: Highcharts.ChartCallbackFunction = function (chart) {
-    console.log("Hello", chart);
-  } // optional function, defaults to null
   updateFlag: boolean = false; // optional boolean
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
-  constructor() { }
+  constructor(private chartService: ChartService) { }
 
   ngOnInit(): void {
+    this.chartOptions = this.chartService.getTypeCompareBoxChart(['Fire', 'Grass']);
   }
 
 }

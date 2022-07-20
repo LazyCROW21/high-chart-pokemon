@@ -1,0 +1,19 @@
+<div class="position-relative overflow-visible">
+    <input 
+        class="form-control" 
+        [placeholder]="placeholder" 
+        (focus)="onFocus()" 
+        [(ngModel)]="inputValue"
+    >
+    <div *ngIf="inputFocused" class="position-absolute top-0 start-0 w-100 mt-5" style="z-index: 100;">
+        <select class="form-select" size="4" (change)="onChanged()" [(ngModel)]="selectedValue">
+            <option
+                *ngFor="let option of options | filter: inputValue"
+                [value]="{ label: option.label, value: option.value } | json"
+                (click)="onChanged()"
+            >
+                {{ option.label }}
+            </option>
+        </select>
+    </div>
+</div>

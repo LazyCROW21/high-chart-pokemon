@@ -7,4 +7,16 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'high-chart-pokemon';
+  
+  pokemonSelect(pokemon: number, event: any) {
+    console.log(pokemon, event)
+  }
+
+  pokemonOptions = [
+    { label: 'A', value: 'A' },
+    { label: 'B', value: 'B' },
+    { label: 'C', value: 'C' },
+    { label: 'D', value: 'D' },
+    { label: 'E', value: 'E' },
+  ];
 }
