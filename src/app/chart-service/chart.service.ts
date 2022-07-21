@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import Highcharts from 'highcharts';
+import Highcharts, { PointClickEventObject } from 'highcharts';
+import { BehaviorSubject } from 'rxjs';
 
 import POKEMON_DATA from '../../assets/POKEMON_DATA.json';
 
@@ -29,7 +30,17 @@ export class ChartService {
     'Fairy': '#ffaeb9',
   }
 
+  selectedPokemon1 = new BehaviorSubject<number>(3);
+  selectedPokemon2 = new BehaviorSubject<number>(6);
+
+  selectedTypes = new BehaviorSubject<Set<string>>(new Set<string>);
+
   constructor() { }
+
+  changeSelectedPokemon(p1: number, p2: number) {
+    this.selectedPokemon1.next(p1);
+    this.selectedPokemon2.next(p2);
+  }
 
   getPokemonById(index: number) {
     return POKEMON_DATA.find(pokemom => pokemom['#'] === index);
@@ -39,13 +50,13 @@ export class ChartService {
     return POKEMON_DATA.slice();
   }
 
-  getTypeCompareBoxChart(types: string[]) {
+  getTypeCompareBoxChart() {
     const allPokemons = this.getAllPokemons();
     const pokemonContainer: any = {};
     allPokemons.forEach((pokemon) => {
-      types.forEach((t) => {
-        if(pokemon["Type 1"] === t || pokemon["Type 2"] === t) {
-          if(pokemonContainer[t]) {
+      this.selectedTypes.value.forEach((t) => {
+        if (pokemon["Type 1"] === t || pokemon["Type 2"] === t) {
+          if (pokemonContainer[t]) {
             pokemonContainer[t]['HP'].push(pokemon.HP);
             pokemonContainer[t]['ATK'].push(pokemon.Attack);
             pokemonContainer[t]['DEF'].push(pokemon.Defense);
@@ -54,12 +65,12 @@ export class ChartService {
             pokemonContainer[t]['SPD'].push(pokemon.Speed);
           } else {
             pokemonContainer[t] = {};
-            pokemonContainer[t]['HP'] = [ pokemon.HP ];
-            pokemonContainer[t]['ATK'] = [ pokemon.Attack ];
-            pokemonContainer[t]['DEF'] = [ pokemon.Defense ];
-            pokemonContainer[t]['SP. ATK'] = [ pokemon['Sp. Atk'] ];
-            pokemonContainer[t]['SP. DEF'] = [ pokemon['Sp. Def'] ];
-            pokemonContainer[t]['SPD'] = [ pokemon.Speed ];
+            pokemonContainer[t]['HP'] = [pokemon.HP];
+            pokemonContainer[t]['ATK'] = [pokemon.Attack];
+            pokemonContainer[t]['DEF'] = [pokemon.Defense];
+            pokemonContainer[t]['SP. ATK'] = [pokemon['Sp. Atk']];
+            pokemonContainer[t]['SP. DEF'] = [pokemon['Sp. Def']];
+            pokemonContainer[t]['SPD'] = [pokemon.Speed];
           }
         }
       });
@@ -67,10 +78,10 @@ export class ChartService {
 
     const seriesData: any[] = [];
     const pokemonAttr = ['HP', 'ATK', 'DEF', 'SP. ATK', 'SP. DEF', 'SPD'];
-    
-    types.forEach((t) => {
+
+    this.selectedTypes.value.forEach((t) => {
       pokemonAttr.forEach((attr) => {
-        pokemonContainer[t][attr].sort((a: number, b: number) =>  a - b);
+        pokemonContainer[t][attr].sort((a: number, b: number) => a - b);
       });
       const min = 0;
       const lq = Math.floor(pokemonContainer[t]['HP'].length * 0.25);
@@ -121,15 +132,16 @@ export class ChartService {
   }
 
   getTypeChart() {
+    const selectedPokemonTypes = this.selectedTypes.value;
     const allPokemons = this.getAllPokemons();
     const pie: any = {};
     allPokemons.forEach((pokemon) => {
-      if(pie.hasOwnProperty(pokemon['Type 1'])) {
+      if (pie.hasOwnProperty(pokemon['Type 1'])) {
         pie[pokemon['Type 1']]++;
       } else {
         pie[pokemon['Type 1']] = 1;
       }
-      if(pie.hasOwnProperty(pokemon['Type 2'])) {
+      if (pie.hasOwnProperty(pokemon['Type 2'])) {
         pie[pokemon['Type 2']]++;
       } else {
         pie[pokemon['Type 2']] = 1;
@@ -137,17 +149,34 @@ export class ChartService {
     });
     const pieData = [];
     const keys = Object.getOwnPropertyNames(pie);
-    for(let k of keys) {
-      if(k) {
-        console.log(k);
+    const theService = this;
+    for (let k of keys) {
+      if (k) {
         pieData.push(<Highcharts.PointOptionsObject>{
           name: k,
           color: this.typeColors[k],
-          y: pie[k]
+          y: pie[k],
+          id: k,
+          selected: selectedPokemonTypes.has(k),
+          events: {
+            click: function (event: any) {
+              event.preventDefault();
+              const chkPKMONType = theService.selectedTypes.value;
+              if (chkPKMONType.has(event.point.id)) {
+                this.sliced = false;
+                chkPKMONType.delete(event.point.id);
+              } else {
+                this.sliced = true;
+                chkPKMONType.add(event.point.id);
+              }
+              this.update(this, true);
+              theService.selectedTypes.next(chkPKMONType);
+            }
+          }
         });
       }
     }
-    return <Highcharts.Options> {
+    return <Highcharts.Options>{
       title: {
         text: 'Pokemon Type Distribution'
       },
@@ -172,12 +201,12 @@ export class ChartService {
       credits: {
         enabled: false
       }
-    }; 
+    };
   }
 
-  getComparePokemonData(p1: number, p2: number) {
-    const pokemon1 = this.getPokemonById(p1);
-    const pokemon2 = this.getPokemonById(p2);
+  getComparePokemonData() {
+    const pokemon1 = this.getPokemonById(this.selectedPokemon1.value);
+    const pokemon2 = this.getPokemonById(this.selectedPokemon2.value);
     return <Highcharts.Options>{
       title: {
         text: `${pokemon1?.Name} v/s ${pokemon2?.Name}`

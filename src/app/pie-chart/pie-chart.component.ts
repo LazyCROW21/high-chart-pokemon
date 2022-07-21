@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { ChartService } from '../chart-service/chart.service';
 
@@ -44,9 +44,8 @@ export class PieChartComponent implements OnInit {
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
   constructor(private chartService: ChartService) { }
-
+  
   ngOnInit(): void {
     this.chartOptions = this.chartService.getTypeChart();
   }
-
 }

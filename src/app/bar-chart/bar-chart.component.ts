@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import { Subscription } from 'rxjs';
 import { ChartService } from '../chart-service/chart.service';
 
 @Component({
@@ -7,7 +8,10 @@ import { ChartService } from '../chart-service/chart.service';
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.css']
 })
-export class BarChartComponent implements OnInit {
+export class BarChartComponent implements OnInit, OnDestroy {
+  pokemon1Sub: Subscription;
+  pokemon2Sub: Subscription;
+
   Highcharts: typeof Highcharts = Highcharts; // required
   chartConstructor: string = 'chart';
   chartOptions: Highcharts.Options = {
@@ -62,10 +66,22 @@ export class BarChartComponent implements OnInit {
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
-  constructor(private chartService: ChartService) { }
-
+  constructor(private chartService: ChartService) {
+    this.pokemon1Sub = chartService.selectedPokemon1.subscribe((pokemonId) => {
+      this.chartOptions = this.chartService.getComparePokemonData();
+    });
+    this.pokemon2Sub = chartService.selectedPokemon2.subscribe((pokemonId) => {
+      this.chartOptions = this.chartService.getComparePokemonData();
+    });
+  }
+  
   ngOnInit(): void {
-    this.chartOptions = this.chartService.getComparePokemonData(3, 6);
+    this.chartOptions = this.chartService.getComparePokemonData();
+  }
+
+  ngOnDestroy(): void {
+    this.pokemon1Sub.unsubscribe();
+    this.pokemon2Sub.unsubscribe();
   }
 
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more'
+import { Subscription } from 'rxjs';
 import { ChartService } from '../chart-service/chart.service';
 
 HighchartsMore(Highcharts);
@@ -11,6 +12,7 @@ HighchartsMore(Highcharts);
   styleUrls: ['./box-chart.component.css']
 })
 export class BoxChartComponent implements OnInit {
+  pokemonTypeSub: Subscription;
   Highcharts: typeof Highcharts = Highcharts; // required
   chartConstructor: string = 'chart';
   chartOptions: Highcharts.Options = {
@@ -51,10 +53,17 @@ export class BoxChartComponent implements OnInit {
   oneToOneFlag: boolean = true; // optional boolean, defaults to false
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
-  constructor(private chartService: ChartService) { }
-
-  ngOnInit(): void {
-    this.chartOptions = this.chartService.getTypeCompareBoxChart(['Fire', 'Grass']);
+  constructor(private chartService: ChartService) {
+    this.pokemonTypeSub = this.chartService.selectedTypes.subscribe((data: any) => {
+      this.chartOptions = this.chartService.getTypeCompareBoxChart();
+    });
   }
 
+  ngOnInit(): void {
+    this.chartOptions = this.chartService.getTypeCompareBoxChart();
+  }
+
+  ngOnDestroy(): void {
+    this.pokemonTypeSub.unsubscribe();
+  }
 }
