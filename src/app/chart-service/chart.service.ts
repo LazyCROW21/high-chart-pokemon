@@ -33,7 +33,7 @@ export class ChartService {
   selectedPokemon1 = new BehaviorSubject<number>(3);
   selectedPokemon2 = new BehaviorSubject<number>(6);
 
-  selectedTypes = new BehaviorSubject<Set<string>>(new Set<string>);
+  selectedTypes = new BehaviorSubject<Set<string>>(new Set<string>(['Fire', 'Grass']));
 
   constructor() { }
 
@@ -157,7 +157,7 @@ export class ChartService {
           color: this.typeColors[k],
           y: pie[k],
           id: k,
-          selected: selectedPokemonTypes.has(k),
+          sliced: selectedPokemonTypes.has(k),
           events: {
             click: function (event: any) {
               event.preventDefault();
