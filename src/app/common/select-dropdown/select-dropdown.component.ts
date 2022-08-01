@@ -11,11 +11,11 @@ export class SelectDropdownComponent implements OnInit {
   // ultimately this will make the dropdown visible/hidden
   inputFocused = false;
 
-  // searched text
+  @Input('value')
   inputValue = '';
-
-  // selected value for dropdown
-  selectedValue = '';
+  
+  // searched text
+  searchValue = '';
 
   @Output('select')
   changeEvent = new EventEmitter<any>();
@@ -24,17 +24,23 @@ export class SelectDropdownComponent implements OnInit {
   @Input()
   placeholder = '';
 
+  @Input()
+  exclude: number[] = [];
+
   // Options to display in dropdown
   @Input()
   options: Option[] = [];
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
   onFocus() {
     this.inputFocused = true;
+  }
+
+  onSearch(event: any) {
+    this.searchValue = event.target.value;
   }
 
   onBlur() {
@@ -42,7 +48,8 @@ export class SelectDropdownComponent implements OnInit {
   }
 
   // trigged when an ption is clicked
-  onChanged() {
+  onChanged(event: any) {
+    console.log(event)
     /* 
       An option cannot store object, it can only store strings, but I am storing { label: '...', value: '...' }
       So I store it as string in JSON format,
@@ -66,9 +73,10 @@ export class SelectDropdownComponent implements OnInit {
       to achieve that we need to parse the option array and find option having value === 1
       To save the trouble I store the label with value as object and that object as JSON.
     */
-    const val = JSON.parse(this.selectedValue);
-    this.inputValue = val.label;
-    this.changeEvent.emit(val.value);
     this.onBlur();
+    const val = JSON.parse(event.target.value);
+    this.changeEvent.emit(val.value);
+    // this.inputValue = val.label;
+    // console.log(this.inputValue);
   }
 }

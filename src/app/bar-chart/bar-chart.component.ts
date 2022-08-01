@@ -67,10 +67,10 @@ export class BarChartComponent implements OnInit, OnDestroy {
   runOutsideAngular: boolean = false; // optional boolean, defaults to false
 
   constructor(private chartService: ChartService) {
-    this.pokemon1Sub = chartService.selectedPokemon1.subscribe((pokemonId) => {
+    this.pokemon1Sub = chartService.selectedPokemons.subscribe((pokemons) => {
       this.chartOptions = this.chartService.getComparePokemonData();
     });
-    this.pokemon2Sub = chartService.selectedPokemon2.subscribe((pokemonId) => {
+    this.pokemon2Sub = chartService.selectedPokemons.subscribe((pokemons) => {
       this.chartOptions = this.chartService.getComparePokemonData();
     });
   }

@@ -6,8 +6,12 @@ import { Option } from '../common.type';
 })
 export class FilterPipe implements PipeTransform {
 
-  transform(value: Option[], search: string): Option[] {
+  transform(value: Option[], search: string, exclude: number[]): Option[] {
+    const excludeSet = new Set<number>(exclude);
     return value.filter((option) => {
+      if(excludeSet.has(option.value)) {
+        return false;
+      }
       return option.label.toLowerCase().includes(search.toLowerCase());
     })
   }

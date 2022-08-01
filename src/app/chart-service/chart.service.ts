@@ -30,16 +30,30 @@ export class ChartService {
     'Fairy': '#ffaeb9',
   }
 
-  selectedPokemon1 = new BehaviorSubject<number>(3);
-  selectedPokemon2 = new BehaviorSubject<number>(6);
+  selectedPokemons = new BehaviorSubject<Set<number>>(new Set<number>([3, 6]));
+
+  getAllPokemonTypes() {
+    let allTypes = new Set<string>();
+    POKEMON_DATA.forEach(pokemon => {
+      allTypes.add(pokemon['Type 1']);
+      allTypes.add(pokemon['Type 2']);
+    });
+    allTypes.delete("");
+    return allTypes;
+  }
 
   selectedTypes = new BehaviorSubject<Set<string>>(new Set<string>(['Fire', 'Grass']));
 
   constructor() { }
 
-  changeSelectedPokemon(p1: number, p2: number) {
-    this.selectedPokemon1.next(p1);
-    this.selectedPokemon2.next(p2);
+  selectPokemon(pokedex: number) {
+    this.selectedPokemons.value.add(pokedex);
+    this.selectedPokemons.next(this.selectedPokemons.value);
+  }
+
+  unselectPokemon(pokedex: number) {
+    this.selectedPokemons.value.delete(pokedex);
+    this.selectedPokemons.next(this.selectedPokemons.value);
   }
 
   getPokemonById(index: number) {
@@ -205,11 +219,28 @@ export class ChartService {
   }
 
   getComparePokemonData() {
-    const pokemon1 = this.getPokemonById(this.selectedPokemon1.value);
-    const pokemon2 = this.getPokemonById(this.selectedPokemon2.value);
+    const pokemonSeries: any[] = [];
+    let title = ''
+    this.selectedPokemons.value.forEach((pokemon) => {
+      const pokemonData = this.getPokemonById(pokemon);
+      title += pokemonData?.Name + ' v/s ';
+      pokemonSeries.push({
+        name: pokemonData?.Name,
+        data: [
+          ['HP', pokemonData?.['HP']],
+          ['ATK', pokemonData?.['Attack']],
+          ['DEF', pokemonData?.['Defense']],
+          ['SP. ATK', pokemonData?.['Sp. Atk']],
+          ['SP. DEF', pokemonData?.['Sp. Def']],
+          ['SPD', pokemonData?.['Speed']]
+        ],
+        type: 'bar'
+      });
+    });
+    
     return <Highcharts.Options>{
       title: {
-        text: `${pokemon1?.Name} v/s ${pokemon2?.Name}`
+        text: title.substring(0, title.length - 4)
       },
       chart: {
         type: 'bar'
@@ -225,32 +256,7 @@ export class ChartService {
           text: 'Base Stats'
         }
       },
-      series: [
-        {
-          name: pokemon1?.Name,
-          data: [
-            ['HP', pokemon1?.['HP']],
-            ['ATK', pokemon1?.['Attack']],
-            ['DEF', pokemon1?.['Defense']],
-            ['SP. ATK', pokemon1?.['Sp. Atk']],
-            ['SP. DEF', pokemon1?.['Sp. Def']],
-            ['SPD', pokemon1?.['Speed']]
-          ],
-          type: 'bar'
-        },
-        {
-          name: pokemon2?.Name,
-          data: [
-            ['HP', pokemon2?.['HP']],
-            ['ATK', pokemon2?.['Attack']],
-            ['DEF', pokemon2?.['Defense']],
-            ['SP. ATK', pokemon2?.['Sp. Atk']],
-            ['SP. DEF', pokemon2?.['Sp. Def']],
-            ['SPD', pokemon2?.['Speed']]
-          ],
-          type: 'bar'
-        }
-      ],
+      series: pokemonSeries,
       plotOptions: {
         bar: {
           dataLabels: { enabled: true }
